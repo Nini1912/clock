@@ -1,29 +1,40 @@
-const secondsHand = document.querySelector(".second");
-const minutesHand = document.querySelector(".minute");
-const hoursHand = document.querySelector(".hour");
-const body = document.querySelector("body");
+const secondsHand = document.querySelector("[data-second-hand]");
+const minutesHand = document.querySelector("[data-minute-hand]");
+const hoursHand = document.querySelector("[data-hour-hand]");
+const digitalTime = document.querySelector("[data-digital-time]");
+const dateDisplay = document.querySelector("[data-date]");
 
-const timeBox = document.createElement("div");
-timeBox.classList.add("time");
-body.appendChild(timeBox);
+const timeFormatter = new Intl.DateTimeFormat(undefined, {
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
 
-setInterval(setClock, 1000);
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+
+function setRotation(element, degrees) {
+  element.style.setProperty("--rotation", `${degrees}deg`);
+}
 
 function setClock() {
-  const date = new Date();
+  const now = new Date();
+  const seconds = now.getSeconds();
+  const minutes = now.getMinutes() + seconds / 60;
+  const hours = (now.getHours() % 12) + minutes / 60;
 
-  const secondsRatio = date.getSeconds();
-  const minutesRatio = date.getMinutes();
-  const hoursRatio = date.getHours();
+  setRotation(secondsHand, seconds * 6);
+  setRotation(minutesHand, minutes * 6);
+  setRotation(hoursHand, hours * 30);
 
-  secondsHand.style.transform = `rotate(${secondsRatio * 6}deg)`;
-  minutesHand.style.transform = `rotate(${minutesRatio * 6}deg)`;
-  hoursHand.style.transform = `rotate(${hoursRatio * 30}deg)`;
-
-  timeBox.innerHTML = `<p>${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}, ${
-    date.getMonth() + 1
-  }.${date.getDate()}.${date.getFullYear()}</p>`;
+  digitalTime.textContent = timeFormatter.format(now);
+  dateDisplay.textContent = dateFormatter.format(now);
 }
 
 setClock();
-
+setInterval(setClock, 1000);
